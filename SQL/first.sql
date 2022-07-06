@@ -28,7 +28,7 @@ CREATE TABLE requests(
 	software_id INTEGER NOT NULL,
 	req_start_date DATE,
 	req_close_date DATE,
-	status VARCHAR(20) NOT NULL
+	status VARCHAR(20) DEFAULT 'valid'
 );
 
 
@@ -81,4 +81,16 @@ FOR EACH ROW
 	EXECUTE PROCEDURE trigger_function2();
 	
 	
+	
+-- Inserting some data
+
+INSERT INTO services (software_id, s_name, category, s_size)
+VALUES (127534, 'Office', 'A', 324);
+
+INSERT INTO requests (emp_id, software_id)
+VALUES (1534, 127534 );
+
+INSERT INTO employer (emp_id, fname, join_date, curr_pos, dep, asigned_project)
+VALUES (5643, 'John', '2022-06-15', 'Salesman', 'Sales', 'Selling Printers');
+
 
