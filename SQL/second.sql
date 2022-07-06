@@ -88,4 +88,87 @@ ORDER BY "Customer Name";
 INSERT INTO mediatype (mediatypeid, name)
 VALUES (6, 'MP3');
 
+DROP FUNCTION IF EXISTS mp3_preventer CASCADE;
+CREATE FUNCTION mp3_preventer() 
+   RETURNS TRIGGER 
+   LANGUAGE PLPGSQL
+   AS $$
+BEGIN
+  IF NEW.mediatypeid = 6 THEN
+  RAISE NOTICE 'MP3 format can not be inserted';
+  RETURN NULL;
+  END IF;
+  RETURN NEW;
+END;
+$$;
 
+-- TRIGGER 
+DROP TRIGGER IF EXISTS mp3_preventer ON track;
+CREATE TRIGGER mp3_preventer
+BEFORE INSERT ON track
+FOR EACH ROW 
+EXECUTE PROCEDURE mp3_preventer();
+
+
+
+-- 11
+
+-- 11
+DROP TABLE IF EXISTS tracks_audit_log;
+CREATE TABLE tracks_audit_log(
+	operation varchar(10),
+	datetime timestamp,
+	username varchar(20),
+	old_value varchar(100),
+	new_value varchar(100)
+);
+
+DROP FUNCTION IF EXISTS change_trigger CASCADE;
+CREATE FUNCTION change_trigger() 
+RETURNS trigger 
+AS $$
+ 
+BEGIN
+ 
+IF TG_OP = 'INSERT'
+	 THEN
+	 INSERT INTO tracks_audit_log (operation, datetime, username,  new_value)
+	 VALUES (TG_OP, NOW(), CURRENT_USER, NEW.name);
+	 RETURN NEW;
+                        
+ ELSIF TG_OP = 'UPDATE'
+ THEN                              
+	 INSERT INTO tracks_audit_log (operation, datetime, username, old_value, new_value)
+	 VALUES (TG_OP, NOW(), CURRENT_USER, OLD.name, NEW.name);
+	 RETURN NEW OLD;
+
+ ELSIF TG_OP = 'DELETE'
+ THEN                              
+	 INSERT INTO tracks_audit_log (operation, datetime, username, old_value)
+	 VALUES (TG_OP, NOW(), CURRENT_USER, OLD.name);
+	 RETURN OLD;
+ END IF;
+ END;
+ 
+$$ LANGUAGE 'plpgsql' SECURITY DEFINER;
+
+
+DROP TRIGGER IF EXISTS logger ON track;
+CREATE TRIGGER logger
+AFTER INSERT OR UPDATE OR DELETE ON track
+FOR EACH ROW 
+EXECUTE PROCEDURE change_trigger();
+
+
+-- FOR TESTING
+
+INSERT INTO track (trackid, name, albumid, mediatypeid, genreid, composer, milliseconds, bytes, unitprice)
+VALUES (65645, 'Here comes the sun', 56, 5, 13, 'Beatles', 4321, 5432, 1234);
+
+UPDATE track SET name = 'Lucy in the sky' WHERE trackid = 65645;
+
+DELETE FROM track WHERE trackid = 65645;
+
+SELECT * FROM track WHERE trackid = 65645;
+
+SELECT * FROM tracks_audit_log;
