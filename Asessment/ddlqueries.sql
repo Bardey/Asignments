@@ -95,38 +95,38 @@ EXECUTE PROCEDURE unique_checker_ongoing_training();
 
 DROP TABLE employee;
 CREATE TABLE employee (
-	user_id INT NOT NULL PRIMARY KEY ,
-	employee_num INT NOT NULL,
-	creation_date DATE NOT NULL,
-	username VARCHAR(20) NOT NULL,
-	pw VARCHAR(20) NOT NULL,
-	emp_level INT NOT NULL,
+	user_id INT PRIMARY KEY ,
+	employee_num INT,
+	creation_date DATE,
+	username VARCHAR(20),
+	pw VARCHAR(20),
+	emp_level INT,
 	is_active BOOL DEFAULT '1'
 );
 
 DROP TABLE course;
 CREATE TABLE course (
-	course_id INT NOT NULL PRIMARY KEY,
-	course_name VARCHAR(50) NOT NULL,
-	platform_id INT NOT NULL,
-	duration TIME NOT NULL,
-	create_date DATE NOT NULL,
-	tags TEXT NOT NULL,
+	course_id INT PRIMARY KEY,
+	course_name VARCHAR(50),
+	platform_id INT,
+	duration TIME,
+	create_date DATE,
+	tags TEXT,
 	photo JSONB,
 	is_active BOOL DEFAULT '1'
 );
 DROP TABLE platform;
 CREATE TABLE platform (
-	platform_id INT NOT NULL PRIMARY KEY,
-	platform_name VARCHAR(50) NOT NULL,
-	hyper_path TEXT NOT NULL,
+	platform_id INT PRIMARY KEY,
+	platform_name VARCHAR(50),
+	hyper_path TEXT,
 	is_active BOOL DEFAULT '1'
 );
 
 DROP TABLE review;
 CREATE TABLE review (
-	user_id INT NOT NULL,
-	course_id INT NOT NULL,
+	user_id INT,
+	course_id INT,
 	feedback TEXT,
 	has_liked BOOL,
 	rank_score INT CHECK (rank_score BETWEEN 1 AND 5),
@@ -135,9 +135,9 @@ CREATE TABLE review (
 
 DROP TABLE certification;
 CREATE TABLE certification (
-	cert_id INT NOT NULL PRIMARY KEY,
-	user_id INT NOT NULL,
-	course_id INT NOT NULL,
+	cert_id INT PRIMARY KEY,
+	user_id INT,
+	course_id INT,
 	complete_duration TIME,
 	complete_date DATE,
 	is_active BOOL DEFAULT '1'
@@ -145,22 +145,22 @@ CREATE TABLE certification (
 
 DROP table ongoing_training;
 CREATE TABLE ongoing_training (
-	training_id INT NOT NULL PRIMARY KEY,
-	user_id INT NOT NULL,
-	course_id INT NOT NULL,
-	status STATUS NOT NULL,
-	complete_percentage DECIMAL(3,2) NOT NULL,
-	start_date DATE NOT NULL,
+	training_id INT PRIMARY KEY,
+	user_id INT,
+	course_id INT,
+	status STATUS,
+	complete_percentage INT,
+	start_date DATE,
 	finish_date DATE,
-	last_updated DATE NOT NULL,
+	last_updated DATE,
 	is_active BOOL DEFAULT '1'
 );
 
 
 DROP TABLE photo;
 CREATE TABLE photo(
-	course_id INT NOT NULL,
-	platform_id INT NOT NULL,
+	course_id INT,
+	platform_id INT,
 	img JSONB
 );
 
