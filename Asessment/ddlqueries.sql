@@ -71,23 +71,24 @@ BEFORE INSERT ON platform
 FOR EACH ROW 
 EXECUTE PROCEDURE unique_checker_platform();
 
-
 DROP FUNCTION IF EXISTS unique_checker_ongoing_training CASCADE;
 CREATE FUNCTION unique_checker_ongoing_training() 
    RETURNS TRIGGER 
    LANGUAGE PLPGSQL
    AS $$
 BEGIN
-  IF NEW.training_id IN (SELECT training_id FROM ongoing_training) THEN
+  IF NEW.training_id IN (SELECT training_id FROM ongoing_training)
+  OR 
+  NEW.user_id IN (SELECT user_id FROM ongoing_training) AND NEW.course_id IN (SELECT course_id FROM ongoing_training)
+  THEN
   RAISE NOTICE 'This record exists already';
   RETURN NULL;
   END IF;
   RETURN NEW;
 END;
 $$;
-
 -- TRIGGER 
-DROP TRIGGER IF EXISTS unique_checker_ongoing_training ON employee;
+DROP TRIGGER IF EXISTS unique_checker_ongoing_training ON ongoing_training;
 CREATE TRIGGER unique_checker_ongoing_training
 BEFORE INSERT ON ongoing_training
 FOR EACH ROW 
