@@ -33,6 +33,7 @@ INSERT INTO kiado VALUES(2314,'Sony Interactive Entertainment', 'Tokyo, Japan', 
 SELECT * FROM kiado;
 
 
+-- CHECKING IF PBLISHER IN DATABASE TRIGGER 
 DROP FUNCTION IF EXISTS exist_check CASCADE;
 CREATE FUNCTION exist_check() 
    RETURNS TRIGGER 
@@ -48,9 +49,32 @@ BEGIN
 END;
 $$;
 
--- TRIGGER 
 DROP TRIGGER IF EXISTS exist_check ON videojatek;
 CREATE TRIGGER exist_check
 BEFORE INSERT ON videojatek
 FOR EACH ROW 
 EXECUTE PROCEDURE exist_check();
+
+
+
+-- CHECKING IF GAME ALREADY EXISTS TRIGGER 
+DROP FUNCTION IF EXISTS unique_checker CASCADE;
+CREATE FUNCTION unique_checker() 
+   RETURNS TRIGGER 
+   LANGUAGE PLPGSQL
+   AS $$
+BEGIN
+  IF NEW.videojatek_id IN (SELECT videojatek_id FROM videojatek) 
+  THEN
+  RAISE NOTICE '% már az adatbázisban van', NEW.videojatek_nev;
+  RETURN NULL;
+  END IF;
+  RETURN NEW;
+END;
+$$;
+-- TRIGGER 
+DROP TRIGGER IF EXISTS unique_checker ON videojatek;
+CREATE TRIGGER unique_checker
+BEFORE INSERT ON videojatek
+FOR EACH ROW 
+EXECUTE PROCEDURE unique_checker();
