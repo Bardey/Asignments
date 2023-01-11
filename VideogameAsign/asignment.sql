@@ -78,3 +78,9 @@ CREATE TRIGGER unique_checker
 BEFORE INSERT ON videojatek
 FOR EACH ROW 
 EXECUTE PROCEDURE unique_checker();
+
+
+copy videojatek FROM '/Users/lantosfeher/loadFiles/newVideojatek.csv' WITH DELIMITER ';' CSV HEADER;
+
+SELECT * FROM kiado;
+SELECT * FROM videojatek;
