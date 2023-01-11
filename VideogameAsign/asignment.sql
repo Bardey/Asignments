@@ -31,3 +31,26 @@ INSERT INTO kiado VALUES(2314,'Sony Interactive Entertainment', 'Tokyo, Japan', 
 
 
 SELECT * FROM kiado;
+
+
+DROP FUNCTION IF EXISTS exist_check CASCADE;
+CREATE FUNCTION exist_check() 
+   RETURNS TRIGGER 
+   LANGUAGE PLPGSQL
+   AS $$
+BEGIN
+  IF NEW.kiado_id NOT IN (SELECT kiado_id FROM kiado) 
+  THEN
+  RAISE NOTICE 'Nincs ilyen kiadó az adatbázisban';
+  RETURN NULL;
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+-- TRIGGER 
+DROP TRIGGER IF EXISTS exist_check ON videojatek;
+CREATE TRIGGER exist_check
+BEFORE INSERT ON videojatek
+FOR EACH ROW 
+EXECUTE PROCEDURE exist_check();
